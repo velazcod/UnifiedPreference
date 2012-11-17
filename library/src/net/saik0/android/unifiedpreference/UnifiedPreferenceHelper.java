@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2012, Joel Pedraza
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,20 +25,25 @@ import net.saik0.android.unifiedpreference.internal.utils.XmlUtils;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceActivity.Header;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.util.Xml;
 
+@SuppressLint("NewApi")
 public class UnifiedPreferenceHelper {
 	private final PreferenceActivity mActivity;
 	private int mHeaderRes;
@@ -65,7 +70,7 @@ public class UnifiedPreferenceHelper {
 	 * extra-large screen. In these cases, a single-pane "simplified" settings
 	 * UI should be shown.
 	 */
-	public boolean isSinglePane() {
+  public boolean isSinglePane() {
 		if (mSinglePane == null) {
 			mSinglePane = Boolean
 					.valueOf(Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
@@ -77,7 +82,7 @@ public class UnifiedPreferenceHelper {
 
 	/**
 	 * Returns the header resource to be used when building headers.
-	 * 
+	 *
 	 * @return The id of the header resource
 	 */
 	public int getHeaderRes() {
@@ -88,7 +93,7 @@ public class UnifiedPreferenceHelper {
 	 * Sets the header resource to be used when building headers.
 	 * This must be called before super.onCreate unless overriding both
 	 * {@link #onBuildHeaders(List)} and {@link #onBuildLegacyHeaders(List)}
-	 * 
+	 *
 	 * @param headerRes The id of the header resource
 	 */
 	public void setHeaderRes(int headerRes) {
@@ -100,7 +105,7 @@ public class UnifiedPreferenceHelper {
 	 * managed by this will use. Wraps
 	 * {@link PreferenceManager#getSharedPreferencesName()} if single pane,
 	 * otherwise returns a locally cached String.
-	 * 
+	 *
 	 * @return The name that can be passed to
 	 *         {@link Context#getSharedPreferences(String, int)}
 	 */
@@ -117,7 +122,7 @@ public class UnifiedPreferenceHelper {
 	 * this will use. Wraps {@link PreferenceManager#setSharedPreferencesName()}
 	 * if single pane, otherwise cache it for use by
 	 * {@link UnifiedPreferenceFragment}.
-	 * 
+	 *
 	 * @param sharedPreferencesName The name of the SharedPreferences file.
 	 */
 	@SuppressWarnings("deprecation")
@@ -134,7 +139,7 @@ public class UnifiedPreferenceHelper {
 	 * managed by this will use. Wraps
 	 * {@link PreferenceManager#getSharedPreferencesMode()} if single pane,
 	 * otherwise returns a locally cached int.
-	 * 
+	 *
 	 * @return The mode that can be passed to
 	 *         {@link Context#getSharedPreferences(String, int)}
 	 */
@@ -151,7 +156,7 @@ public class UnifiedPreferenceHelper {
 	 * this will use. Wraps {@link PreferenceManager#setSharedPreferencesMode()}
 	 * if single pane, otherwise cache it for use by
 	 * {@link UnifiedPreferenceFragment}.
-	 * 
+	 *
 	 * @param sharedPreferencesMode The mode of the SharedPreferences file.
 	 */
 	@SuppressWarnings("deprecation")
@@ -207,12 +212,12 @@ public class UnifiedPreferenceHelper {
 	 * not always be called; for example, if the activity has been asked to
 	 * display a particular fragment without the header list, there is no need
 	 * to build the headers.
-	 * 
+	 *
 	 * <p>
 	 * Typical implementations will use {@link #loadHeadersFromResource} to fill
 	 * in the list from a resource. For convenience this is done if a header
 	 * resource has been set with {@link #setHeaderRes(int)}.
-	 * 
+	 *
 	 * @param target The list in which to place the headers.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -225,12 +230,12 @@ public class UnifiedPreferenceHelper {
 
 	/**
 	 * Called when the activity needs its list of legacy headers built.
-	 * 
+	 *
 	 * <p>
 	 * Typical implementations will use {@link #loadLegacyHeadersFromResource}
 	 * to fill in the list from a resource. For convenience this is done if a
 	 * header resource has been set with {@link #setHeaderRes(int)}.
-	 * 
+	 *
 	 * @param target The list in which to place the legacy headers.
 	 */
 	public void onBuildLegacyHeaders(List<LegacyHeader> target) {
@@ -239,7 +244,7 @@ public class UnifiedPreferenceHelper {
 		}
 	}
 
-	/** 
+	/**
 	 * Bind the summaries of EditText/List/Dialog/Ringtone preferences to their
 	 * values. When their values change, their summaries are updated to reflect
 	 * the new value, per the Android Design guidelines.
@@ -253,7 +258,7 @@ public class UnifiedPreferenceHelper {
 	/**
 	 * Parse the given XML file as a header description, adding each parsed
 	 * Header into the target list.
-	 * 
+	 *
 	 * @param resid The XML resource to load and parse.
 	 * @param target The list in which the parsed headers should be placed.
 	 */
@@ -296,7 +301,7 @@ public class UnifiedPreferenceHelper {
 							R.styleable.PreferenceHeader_id,
 							(int) HEADER_ID_UNDEFINED);
 					TypedValue tv = sa
-							.peekValue(R.styleable.PreferenceHeader_title);
+							.peekValue(R.styleable.PreferenceHeader_item_title);
 					if (tv != null && tv.type == TypedValue.TYPE_STRING) {
 						if (tv.resourceId != 0) {
 							header.titleRes = tv.resourceId;
@@ -394,7 +399,7 @@ public class UnifiedPreferenceHelper {
 	/**
 	 * Parse the given XML file as a header description, adding each parsed
 	 * LegacyHeader into the target list.
-	 * 
+	 *
 	 * @param resid The XML resource to load and parse.
 	 * @param target The list in which the parsed headers should be placed.
 	 */
@@ -432,7 +437,7 @@ public class UnifiedPreferenceHelper {
 					TypedArray sa = mActivity.getResources().obtainAttributes(
 							attrs, R.styleable.PreferenceHeader);
 					TypedValue tv = sa
-							.peekValue(R.styleable.PreferenceHeader_title);
+							.peekValue(R.styleable.PreferenceHeader_item_title);
 					if (tv != null && tv.type == TypedValue.TYPE_STRING) {
 						if (tv.resourceId != 0) {
 							header.titleRes = tv.resourceId;
